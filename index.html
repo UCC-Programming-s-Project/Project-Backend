@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime & Manga Universe</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Bungee&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Anime & Manga Universe</h1>
+        <p class="subtitle">Your gateway to the world of Japanese animation and comics</p>
+    </header>
+    <main>
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="anime-search" placeholder="Search for anime...">
+                <button class="clear-btn" data-target="anime-search">X</button>
+            </div>
+            <div class="search-wrapper">
+                <input type="text" id="manga-search" placeholder="Search for manga...">
+                <button class="clear-btn" data-target="manga-search">X</button>
+            </div>
+            <div class="search-wrapper">
+                <input type="text" id="character-search" placeholder="Search for characters...">
+                <button class="clear-btn" data-target="character-search">X</button>
+            </div>
+        </div>
+        <div class="loading-indicator">Loading...</div>
+        <div class="results-container">
+            <div id="anime-results" class="results-section"></div>
+            <div id="manga-results" class="results-section"></div>
+            <div id="character-results" class="results-section"></div>
+        </div>
+    </main>
+    <button id="back-to-top-btn">Top</button>
+    <footer>
+        <p>Powered by <a href="https://jikan.moe/">Jikan API</a></p>
+    </footer>
+    <script src="Card.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
