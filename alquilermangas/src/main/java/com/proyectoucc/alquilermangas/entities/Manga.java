@@ -10,16 +10,19 @@ public class Manga {
 
     private String titulo;
     private String autor;
-    private boolean disponible;
+    private String genero;
+    private double precio;
+
+    @Enumerated(EnumType.STRING)
+    private MangaStatus status;
 
     // Constructor sin argumentos requerido por JPA
     public Manga() {}
 
-    // Constructor opcional
-    public Manga(String titulo, String autor, boolean disponible) {
-        this.titulo = titulo;
-        this.autor = autor;
-        this.disponible = disponible;
+    // Al crear un manga, siempre estara disponible
+    @PrePersist
+    protected void onCreate() {
+        this.status = MangaStatus.DISPONIBLE;
     }
 
     // Getters y setters
@@ -32,6 +35,12 @@ public class Manga {
     public String getAutor() { return autor; }
     public void setAutor(String autor) { this.autor = autor; }
 
-    public boolean isDisponible() { return disponible; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
+
+    public double getPrecio() { return precio; }
+    public void setPrecio(double precio) { this.precio = precio; }
+
+    public MangaStatus getStatus() { return status; }
+    public void setStatus(MangaStatus status) { this.status = status; }
 }
