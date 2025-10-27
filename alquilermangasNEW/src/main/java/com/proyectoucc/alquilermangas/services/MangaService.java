@@ -2,6 +2,7 @@ package com.proyectoucc.alquilermangas.services;
 
 import com.proyectoucc.alquilermangas.entities.Manga;
 import com.proyectoucc.alquilermangas.repositories.MangaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,14 @@ public class MangaService {
     }
 
     public void eliminar(Long id) {
+        if (!mangaRepository.existsById(id)) {
+            throw new EntityNotFoundException("No se encontró un manga con el ID: " + id);
+        }
         mangaRepository.deleteById(id);
+    }
+
+    public Manga obtenerPorId(Long id) {
+        return mangaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Manga no encontrado con ID: " + id));
     }
 }
