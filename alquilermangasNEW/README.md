@@ -31,12 +31,12 @@ Este proyecto es una API RESTful desarrollada en Java con Spring Boot para gesti
 ### Acceder a la Base de Datos H2
 La base de datos en memoria H2 proporciona una consola web para visualizar los datos.
 1.  Navega a `http://localhost:8080/h2-console` en tu navegador.
-2.  Asegúrate de que los parámetros de conexión sean los siguientes (son los valores por defecto de Spring Boot):
+2.  Asegúrate de que los parámetros de conexión sean los siguientes:
     - **Driver Class:** `org.h2.Driver`
-    - **JDBC URL:** `jdbc:h2:mem:testdb`
+    - **JDBC URL:** `jdbc:h2:mem:alquilerdb`
     - **User Name:** `sa`
     - **Password:** (dejar en blanco)
-3.  Haz clic en **Connect** para acceder y ejecutar consultas SQL directamente sobre las tablas `CLIENTE`, `MANGA` y `ALQUILER`.
+3.  Haz clic en **Connect** para acceder. **Nota:** El nombre de la base de datos (`alquilerdb`) se define en el archivo `src/main/resources/application.properties` y debe coincidir en esta pantalla.
 
 ---
 
@@ -52,16 +52,75 @@ El proyecto sigue una arquitectura en capas para separar responsabilidades, lo q
   - `dto` (Data Transfer Object): Clases/Records que definen la **forma pública de los datos**. Se usan para controlar la información que se envía y se recibe a través de la API, evitando exponer la estructura interna de las entidades.
   - `mapper`: Clases de utilidad para convertir `Entities` a `DTOs` y viceversa. Esto centraliza la lógica de transformación.
 
-### Mejoras Clave Implementadas
+---
 
-1.  **Funcionalidad de Devolución**:
-    - Se creó el endpoint `POST /alquileres/{id}/devolver`.
-    - Esta operación es **transaccional (`@Transactional`)**: actualiza el estado `devuelto` del `Alquiler` a `true` y, simultáneamente, actualiza el estado `disponible` del `Manga` a `true`, asegurando la consistencia de los datos.
+## Análisis de Código Relevante
+
+Esta sección destaca fragmentos importantes para entender las decisiones de diseño.
+
+### 1. La Transacción de Devolución (`AlquilerService.java`)
+
+```java
+@Transactional
+public Alquiler devolver(Long id) {
+    Alquiler alquiler = getById(id); // (1)
+
+    if (alquiler.isDevuelto()) { // (2)
+        throw new IllegalStateException("Este alquiler ya ha sido devuelto.");
+    }
+
+    Manga manga = alquiler.getManga(); // (3)
+    manga.setDisponible(true);
+    mangaRepository.save(manga); // (4)
+
+    alquiler.setDevuelto(true); // (5)
+    return alquilerRepository.save(alquiler);
+}
+```
+
+-   **`@Transactional`**: Esta es la anotación más importante aquí. Asegura que todas las operaciones de base de datos dentro del método (`save` en `mangaRepository` y `save` en `alquilerRepository`) se ejecuten como una única unidad. **O ambas tienen éxito, o ninguna lo tiene**. Si la actualización del manga funcionara pero la del alquiler fallara, `@Transactional` revertiría el cambio del manga, manteniendo los datos consistentes.
+-   **(1)** y **(3)**: Se recuperan las entidades de la base de datos.
+-   **(2)**: Se añade lógica de negocio para evitar que un alquiler ya devuelto se procese de nuevo.
+-   **(4)** y **(5)**: Se actualizan las dos entidades relacionadas en la misma operación: el manga vuelve a estar disponible y el alquiler se marca como devuelto.
+
+### 2. Petición de Creación con DTO (`AlquilerController.java`)
+
+```java
+@PostMapping
+public ResponseEntity<AlquilerDTO> create(@RequestBody AlquilerCreateRequestDTO requestDTO) {
+    Alquiler nuevoAlquiler = alquilerService.create(requestDTO);
+    return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toAlquilerDTO(nuevoAlquiler));
+}
+```
+
+-   **`@RequestBody AlquilerCreateRequestDTO`**: Aquí está la mejora. El endpoint ya no recibe la entidad `Alquiler` completa. Recibe un DTO simple que solo contiene los IDs y las fechas. Esto desacopla la API de la estructura interna de la base de datos.
+-   **`alquilerService.create(requestDTO)`**: Se pasa el DTO al servicio, que es el encargado de la lógica compleja de buscar las entidades por ID y crear el alquiler.
+-   **`AlquilerMapper.toAlquilerDTO(...)`**: Antes de devolver la respuesta, la entidad `Alquiler` recién creada se convierte a un `AlquilerDTO`. Esto asegura que la respuesta de la API sea limpia y solo exponga los datos necesarios, ocultando detalles de la base de datos.
+
+### 3. El DTO de Creación (`AlquilerCreateRequestDTO.java`)
+
+```java
+public record AlquilerCreateRequestDTO(
+    Long clienteId,
+    Long mangaId,
+    LocalDateTime fechaInicio,
+    LocalDateTime fechaFin
+) {}
+```
+
+-   **`record`**: Se utiliza un `record` de Java, que es una forma moderna y concisa de crear clases que son simples contenedores de datos inmutables. Es perfecto para definir DTOs.
+-   **Campos**: Nota cómo los campos son solo los IDs (`clienteId`, `mangaId`), no los objetos `Cliente` y `Manga` completos. Esto hace que la petición `POST` sea mucho más ligera y simple para el cliente de la API.
+
+---
+
+## Mejoras Clave Implementadas (Resumen)
+
+1.  **Funcionalidad de Devolución Transaccional**: Se garantiza la consistencia de los datos al devolver un manga, actualizando tanto el alquiler como el inventario del manga de forma atómica.
 
 2.  **Refactorización a DTOs (Data Transfer Objects)**:
-    - **Problema Solucionado**: Antes se exponían las entidades JPA directamente, lo cual es una mala práctica (riesgos de seguridad, acoplamiento).
-    - **Solución**: Se crearon DTOs como `MangaDTO`, `ClienteDTO` y `AlquilerDTO` para las respuestas. Esto define un "contrato" claro para la API.
-    - **Petición Optimizada**: Se creó el `AlquilerCreateRequestDTO`, que simplifica la creación de un alquiler, ya que solo requiere los `IDs` del cliente y el manga, no los objetos completos.
+    - **Problema Solucionado**: Se evitó exponer las entidades JPA directamente, una mala práctica de seguridad y diseño.
+    - **Solución**: Se crearon DTOs (`MangaDTO`, `AlquilerDTO`) para definir un "contrato" claro y seguro para la API.
+    - **Petición Optimizada**: Se simplificó la creación de alquileres con `AlquilerCreateRequestDTO`, requiriendo solo los IDs.
 
 ---
 
@@ -79,7 +138,6 @@ A continuación, se presenta un flujo de trabajo para probar la API.
       "correo": "carlos.mendoza@example.com"
   }
   ```
-- **Resultado:** Recibirás el cliente creado con su `id`.
 
 ### 2. Crear un Manga
 - **Método:** `POST`
@@ -92,7 +150,6 @@ A continuación, se presenta un flujo de trabajo para probar la API.
       "disponible": true
   }
   ```
-- **Resultado:** Recibirás el manga creado con su `id`.
 
 ### 3. Crear un Alquiler (¡Usando el DTO!)
 - **Método:** `POST`
@@ -106,26 +163,12 @@ A continuación, se presenta un flujo de trabajo para probar la API.
       "fechaFin": "2024-01-08T10:00:00.000+00:00"
   }
   ```
-- **Resultado:** Un DTO anidado del alquiler. Notarás que el manga dentro de la respuesta ahora tiene `"isDisponible": false`.
 
-### 4. Verificar el Estado del Manga
-- **Método:** `GET`
-- **URL:** `http://localhost:8080/mangas/1`
-- **Resultado:** El manga "Jujutsu Kaisen" aparecerá con `"isDisponible": false`.
-
-### 5. Devolver el Manga Alquilado
+### 4. Devolver el Manga Alquilado
 - **Método:** `POST`
-- **URL:** `http://localhost:8080/alquileres/1/devolver` (Usa el ID del alquiler, no del manga)
-- **Resultado:** El DTO del alquiler con `"isDevuelto": true`. El manga anidado tendrá `"isDisponible": true`.
+- **URL:** `http://localhost:8080/alquileres/1/devolver` (Usa el ID del alquiler)
 
-### 6. Verificar el Estado del Manga de Nuevo
-- **Método:** `GET`
-- **URL:** `http://localhost:8080/mangas/1`
-- **Resultado:** El manga "Jujutsu Kaisen" volverá a aparecer con `"isDisponible": true`. ¡Listo para ser alquilado de nuevo!
-
-### 7. Probar Caso de Error: Devolver un Alquiler ya Devuelto
+### 5. Probar Caso de Error: Devolver un Alquiler ya Devuelto
 - **Método:** `POST`
 - **URL:** `http://localhost:8080/alquileres/1/devolver`
-- **Resultado:**
-  - **Status:** `409 Conflict` (o `500 Internal Server Error` si no se ha implementado el manejo de excepciones global).
-  - **Mensaje:** `"Este alquiler ya ha sido devuelto."`
+- **Resultado Esperado:** Status `409 Conflict` o `500 Internal Server Error` con el mensaje `"Este alquiler ya ha sido devuelto."`.
