@@ -1,33 +1,40 @@
 package com.proyectoucc.alquilermangas.entities;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
+@Table(name = "alquileres")
 public class Alquiler {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manga_id")
+    @ManyToOne
+    @JoinColumn(name = "manga_id", nullable = false)
     private Manga manga;
 
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
+    private Date fechaInicio;
+    private Date fechaFin;
 
-    // Constructor sin argumentos requerido por JPA
-    public Alquiler() {}
+    @Column(nullable = false)
+    private boolean devuelto = false;
 
-    public Alquiler(Cliente cliente, Manga manga, LocalDate fechaInicio, LocalDate fechaFin) {
+    // Constructores
+    public Alquiler() {
+    }
+
+    public Alquiler(Cliente cliente, Manga manga, Date fechaInicio, Date fechaFin) {
         this.cliente = cliente;
         this.manga = manga;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
+        this.devuelto = false; // Aseguramos que siempre sea falso al crear
     }
 
     // Getters y Setters
@@ -55,19 +62,27 @@ public class Alquiler {
         this.manga = manga;
     }
 
-    public LocalDate getFechaInicio() {
+    public Date getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
+    public void setFechaInicio(Date fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDate getFechaFin() {
+    public Date getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(Date fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public boolean isDevuelto() {
+        return devuelto;
+    }
+
+    public void setDevuelto(boolean devuelto) {
+        this.devuelto = devuelto;
     }
 }

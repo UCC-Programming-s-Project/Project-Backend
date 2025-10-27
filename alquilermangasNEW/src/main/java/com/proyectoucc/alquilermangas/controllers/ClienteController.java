@@ -1,12 +1,15 @@
 package com.proyectoucc.alquilermangas.controllers;
 
+import com.proyectoucc.alquilermangas.dto.ClienteDTO;
 import com.proyectoucc.alquilermangas.entities.Cliente;
+import com.proyectoucc.alquilermangas.mapper.AlquilerMapper;
 import com.proyectoucc.alquilermangas.services.ClienteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
@@ -18,34 +21,35 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
 
+    @PostMapping
+    public ResponseEntity<ClienteDTO> create(@RequestBody Cliente cliente) {
+        Cliente nuevoCliente = clienteService.save(cliente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toClienteDTO(nuevoCliente));
+    }
+
     @GetMapping
-    public ResponseEntity<List<Cliente>> getAll() {
-        return ResponseEntity.ok(clienteService.getAll());
+    public ResponseEntity<List<ClienteDTO>> getAll() {
+        List<ClienteDTO> clientes = clienteService.findAll().stream()
+                .map(AlquilerMapper::toClienteDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(clienteService.getById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<Cliente> create(@RequestBody Cliente cliente) {
-        Cliente nuevoCliente = clienteService.create(cliente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCliente);
+    public ResponseEntity<ClienteDTO> getById(@PathVariable Long id) {
+        Cliente cliente = clienteService.findById(id);
+        return ResponseEntity.ok(AlquilerMapper.toClienteDTO(cliente));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> update(@PathVariable Long id, @RequestBody Cliente cliente) {
-        Cliente clienteExistente = clienteService.getById(id);
-        clienteExistente.setNombre(cliente.getNombre());
-        clienteExistente.setCorreo(cliente.getCorreo());
-        Cliente clienteActualizado = clienteService.create(clienteExistente);
-        return ResponseEntity.ok(clienteActualizado);
+    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody Cliente cliente) {
+        Cliente clienteActualizado = clienteService.update(id, cliente);
+        return ResponseEntity.ok(AlquilerMapper.toClienteDTO(clienteActualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        clienteService.delete(id);
+        clienteService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

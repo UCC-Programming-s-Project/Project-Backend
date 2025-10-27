@@ -1,5 +1,6 @@
 package com.proyectoucc.alquilermangas.services;
 
+import com.proyectoucc.alquilermangas.dto.AlquilerCreateRequestDTO;
 import com.proyectoucc.alquilermangas.entities.Alquiler;
 import com.proyectoucc.alquilermangas.entities.Cliente;
 import com.proyectoucc.alquilermangas.entities.Manga;
@@ -26,26 +27,43 @@ public class AlquilerService {
     }
 
     @Transactional
-    public Alquiler create(Alquiler alquiler) {
-        // Validar que el cliente exista
-        Cliente cliente = clienteRepository.findById(alquiler.getCliente().getId())
+    public Alquiler create(AlquilerCreateRequestDTO requestDTO) {
+        Cliente cliente = clienteRepository.findById(requestDTO.clienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
 
-        // Validar que el manga exista y esté disponible
-        Manga manga = mangaRepository.findById(alquiler.getManga().getId())
+        Manga manga = mangaRepository.findById(requestDTO.mangaId())
                 .orElseThrow(() -> new EntityNotFoundException("Manga no encontrado"));
 
         if (!manga.isDisponible()) {
             throw new IllegalStateException("El manga no está disponible para alquilar");
         }
 
-        // Actualizar el estado del manga y guardar el alquiler
         manga.setDisponible(false);
         mangaRepository.save(manga);
 
+        Alquiler alquiler = new Alquiler();
         alquiler.setCliente(cliente);
         alquiler.setManga(manga);
+        alquiler.setFechaInicio(requestDTO.fechaInicio());
+        alquiler.setFechaFin(requestDTO.fechaFin());
+        alquiler.setDevuelto(false);
 
+        return alquilerRepository.save(alquiler);
+    }
+
+    @Transactional
+    public Alquiler devolver(Long id) {
+        Alquiler alquiler = getById(id);
+
+        if (alquiler.isDevuelto()) {
+            throw new IllegalStateException("Este alquiler ya ha sido devuelto.");
+        }
+
+        Manga manga = alquiler.getManga();
+        manga.setDisponible(true);
+        mangaRepository.save(manga);
+
+        alquiler.setDevuelto(true);
         return alquilerRepository.save(alquiler);
     }
 
@@ -54,12 +72,12 @@ public class AlquilerService {
     }
 
     public Alquiler getById(Long id) {
-        return alquilerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Alquiler no encontrado"));
+        return alquilerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Alquiler no encontrado con ID: " + id));
     }
 
     public void delete(Long id) {
         if (!alquilerRepository.existsById(id)) {
-            throw new EntityNotFoundException("Alquiler no encontrado");
+            throw new EntityNotFoundException("Alquiler no encontrado con ID: " + id);
         }
         alquilerRepository.deleteById(id);
     }
