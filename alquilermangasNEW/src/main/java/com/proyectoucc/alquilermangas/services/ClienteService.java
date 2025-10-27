@@ -16,22 +16,29 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
-    public Cliente create(Cliente cliente) {
+    public Cliente save(Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
-    public List<Cliente> getAll() {
+    public List<Cliente> findAll() {
         return clienteRepository.findAll();
     }
 
-    public Cliente getById(Long id) {
+    public Cliente findById(Long id) {
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + id));
     }
 
-    public void delete(Long id) {
+    public Cliente update(Long id, Cliente clienteDetails) {
+        Cliente cliente = findById(id);
+        cliente.setNombre(clienteDetails.getNombre());
+        cliente.setCorreo(clienteDetails.getCorreo());
+        return clienteRepository.save(cliente);
+    }
+
+    public void deleteById(Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new EntityNotFoundException("No se encontró un cliente con el ID: " + id);
+            throw new EntityNotFoundException("Cliente no encontrado con ID: " + id);
         }
         clienteRepository.deleteById(id);
     }
