@@ -32,7 +32,7 @@ public class MangaService {
         Manga manga = findById(id);
         manga.setTitulo(mangaDetails.getTitulo());
         manga.setAutor(mangaDetails.getAutor());
-        manga.setDisponible(mangaDetails.isDisponible());
+        manga.setDisponible(mangaDetails.getDisponible()); // Corregido
         return mangaRepository.save(manga);
     }
 

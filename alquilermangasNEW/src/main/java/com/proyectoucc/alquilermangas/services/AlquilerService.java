@@ -34,7 +34,7 @@ public class AlquilerService {
         Manga manga = mangaRepository.findById(requestDTO.mangaId())
                 .orElseThrow(() -> new EntityNotFoundException("Manga no encontrado"));
 
-        if (!manga.isDisponible()) {
+        if (!manga.getDisponible()) { // Corregido
             throw new IllegalStateException("El manga no está disponible para alquilar");
         }
 
