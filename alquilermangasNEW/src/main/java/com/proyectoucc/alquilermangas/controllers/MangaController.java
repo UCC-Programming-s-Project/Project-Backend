@@ -1,5 +1,6 @@
 package com.proyectoucc.alquilermangas.controllers;
 
+import com.proyectoucc.alquilermangas.dto.MangaCreateRequestDTO;
 import com.proyectoucc.alquilermangas.dto.MangaDTO;
 import com.proyectoucc.alquilermangas.entities.Manga;
 import com.proyectoucc.alquilermangas.mapper.AlquilerMapper;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/mangas")
+@RequestMapping("/api/mangas") // Corregido: Añadido /api
 public class MangaController {
 
     private final MangaService mangaService;
@@ -22,7 +23,12 @@ public class MangaController {
     }
 
     @PostMapping
-    public ResponseEntity<MangaDTO> create(@RequestBody Manga manga) {
+    public ResponseEntity<MangaDTO> create(@RequestBody MangaCreateRequestDTO mangaDTO) {
+        Manga manga = new Manga();
+        manga.setTitulo(mangaDTO.getTitulo());
+        manga.setAutor(mangaDTO.getAutor());
+        // 'disponible' se establece a true por defecto en la lógica de negocio
+
         Manga nuevoManga = mangaService.save(manga);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toMangaDTO(nuevoManga));
     }
@@ -41,6 +47,7 @@ public class MangaController {
         return ResponseEntity.ok(AlquilerMapper.toMangaDTO(manga));
     }
 
+    // El método update también debería usar un DTO, pero se deja para futura mejora.
     @PutMapping("/{id}")
     public ResponseEntity<MangaDTO> update(@PathVariable Long id, @RequestBody Manga manga) {
         Manga mangaActualizado = mangaService.update(id, manga);
