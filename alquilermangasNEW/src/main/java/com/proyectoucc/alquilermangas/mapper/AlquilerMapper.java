@@ -10,13 +10,13 @@ import com.proyectoucc.alquilermangas.entities.Manga;
 public class AlquilerMapper {
 
     public static ClienteDTO toClienteDTO(Cliente cliente) {
-        // Corregido: Se eliminó la referencia a getCorreo()
-        return new ClienteDTO(cliente.getId(), cliente.getNombre());
+        // CORREGIDO: Añadido getCorreo()
+        return new ClienteDTO(cliente.getId(), cliente.getNombre(), cliente.getCorreo());
     }
 
     public static MangaDTO toMangaDTO(Manga manga) {
-        // Corregido: Se cambió isDisponible() por getDisponible()
-        return new MangaDTO(manga.getId(), manga.getTitulo(), manga.getAutor(), manga.getDisponible());
+        // CORREGIDO: Añadido getImagenUrl()
+        return new MangaDTO(manga.getId(), manga.getTitulo(), manga.getAutor(), manga.getImagenUrl(), manga.getDisponible());
     }
 
     public static AlquilerDTO toAlquilerDTO(Alquiler alquiler) {
