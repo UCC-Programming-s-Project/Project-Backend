@@ -10,7 +10,8 @@ import com.proyectoucc.alquilermangas.entities.Manga;
 public class AlquilerMapper {
 
     public static ClienteDTO toClienteDTO(Cliente cliente) {
-        return new ClienteDTO(cliente.getId(), cliente.getNombre(), cliente.getCorreo());
+        // Corregido: Se eliminó la referencia a getCorreo()
+        return new ClienteDTO(cliente.getId(), cliente.getNombre());
     }
 
     public static MangaDTO toMangaDTO(Manga manga) {
