@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,30 +11,71 @@
     <div class="container">
         <h1>Centro de Alquiler de Mangas</h1>
 
-        <div class="section">
-            <h2>Formulario de Alquiler</h2>
-            <form id="alquilerForm">
-                <div class="form-group">
-                    <label for="clienteSelect">Seleccionar Cliente:</label>
-                    <select id="clienteSelect" required></select>
+        <!-- Columna Izquierda: Formularios -->
+        <div class="main-layout">
+            <div class="form-column">
+                <!-- Formulario de Alquiler -->
+                <div class="section">
+                    <h2>Formulario de Alquiler</h2>
+                    <form id="alquilerForm">
+                        <div class="form-group">
+                            <label for="clienteSelect">Seleccionar Cliente:</label>
+                            <select id="clienteSelect" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mangaSelect">Seleccionar Manga:</label>
+                            <select id="mangaSelect" required></select>
+                        </div>
+                        <button type="submit">Alquilar Manga</button>
+                        <p id="form-error" class="error-message"></p>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="mangaSelect">Seleccionar Manga:</label>
-                    <select id="mangaSelect" required></select>
+
+                <!-- Formulario para Nuevo Manga -->
+                <div class="section">
+                    <h2>Añadir Nuevo Manga</h2>
+                    <form id="mangaForm">
+                        <div class="form-group">
+                            <label for="mangaTitulo">Título:</label>
+                            <input type="text" id="mangaTitulo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mangaAutor">Autor:</label>
+                            <input type="text" id="mangaAutor" required>
+                        </div>
+                        <button type="submit">Añadir Manga</button>
+                    </form>
                 </div>
-                <button type="submit">Alquilar Manga</button>
-                <p id="form-error" class="error-message"></p>
-            </form>
-        </div>
 
-        <div class="section">
-            <h2>Alquileres Activos</h2>
-            <div id="alquileres-list" class="grid-container"></div>
-        </div>
+                <!-- Formulario para Nuevo Cliente -->
+                <div class="section">
+                    <h2>Añadir Nuevo Cliente</h2>
+                    <form id="clienteForm">
+                        <div class="form-group">
+                            <label for="clienteNombre">Nombre:</label>
+                            <input type="text" id="clienteNombre" required>
+                        </div>
+                        <button type="submit">Añadir Cliente</button>
+                    </form>
+                </div>
+            </div>
 
-        <div class="section">
-            <h2>Mangas Disponibles</h2>
-            <div id="mangas-list" class="grid-container"></div>
+            <!-- Columna Derecha: Listas -->
+            <div class="list-column">
+                <div class="section">
+                    <h2>Alquileres Activos</h2>
+                    <div id="alquileres-list" class="grid-container"></div>
+                </div>
+
+                <div class="section">
+                    <h2>Mangas Disponibles</h2>
+                    <div id="mangas-list" class="grid-container"></div>
+                </div>
+                 <div class="section">
+                    <h2>Clientes</h2>
+                    <div id="clientes-list" class="grid-container"></div>
+                </div>
+            </div>
         </div>
     </div>
 
