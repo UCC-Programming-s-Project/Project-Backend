@@ -10,20 +10,20 @@ public class Manga {
 
     private String titulo;
     private String autor;
-    private String imagenUrl; // <-- NUEVO CAMPO
+    private String imagenUrl; 
     private boolean disponible = true;
 
-    // Constructor sin argumentos requerido por JPA
+   
     public Manga() {}
 
-    // Constructor opcional para facilitar la creación
+    
     public Manga(String titulo, String autor, String imagenUrl) {
         this.titulo = titulo;
         this.autor = autor;
         this.imagenUrl = imagenUrl;
     }
 
-    // Getters y setters
+ 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'http://localhost:8080/api';
 
-    // --- REFERENCIAS AL DOM ---
+
     const mangaSelect = document.getElementById('mangaSelect');
     const clienteSelect = document.getElementById('clienteSelect');
     const fechaFinInput = document.getElementById('fechaFin');
@@ -9,23 +9,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const alquileresActivosList = document.getElementById('alquileres-list');
     const clientesList = document.getElementById('clientes-list');
 
-    // Formularios
+
     const alquilerForm = document.getElementById('alquilerForm');
     const mangaForm = document.getElementById('mangaForm');
     const clienteForm = document.getElementById('clienteForm');
     const formError = document.getElementById('form-error');
 
-    // Modales
+
     const mangaModal = new bootstrap.Modal(document.getElementById('mangaModal'));
     const clienteModal = new bootstrap.Modal(document.getElementById('clienteModal'));
 
-    // --- FUNCIÓN PARA ESTABLECER FECHA MÍNIMA ---
+
     function setMinDate() {
         const today = new Date().toISOString().split('T')[0];
         fechaFinInput.setAttribute('min', today);
     }
 
-    // --- FUNCIONES DE CARGA Y RENDERIZADO ---
+   
     async function cargarTodo() {
         await Promise.all([cargarClientes(), cargarMangas(), cargarAlquileres()]);
     }
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(error); }
     }
 
-    // --- MANEJADORES DE EVENTOS PARA FORMULARIOS ---
+    
 
     clienteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -169,20 +169,20 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { alert('No se pudo conectar al servidor.'); }
     });
     
-    // **MODIFICADO: Envía fechas de inicio y fin**
+  
     alquilerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         formError.textContent = '';
         const clienteId = clienteSelect.value;
         const mangaId = mangaSelect.value;
-        const fechaFin = fechaFinInput.value; // Captura la fecha de devolución
+        const fechaFin = fechaFinInput.value; 
 
         if (!clienteId || !mangaId || !fechaFin) {
             formError.textContent = 'Por favor, complete todos los campos.';
             return;
         }
 
-        const fechaInicio = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+        const fechaInicio = new Date().toISOString().split('T')[0]; 
 
         try {
             const response = await fetch(`${API_URL}/alquileres`, {
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 201) {
                 alquilerForm.reset();
-                setMinDate(); // Resetea la fecha mínima por si acaso
+                setMinDate(); 
                 cargarTodo();
             } else {
                 const errorData = await response.json();
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- MANEJADORES DE EVENTOS PARA BOTONES ---
+   
     document.getElementById('addClienteBtn').addEventListener('click', () => {
         document.getElementById('clienteModalTitle').textContent = 'Añadir Nuevo Cliente';
         clienteForm.reset();
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- INICIALIZACIÓN ---
+
     setMinDate();
     cargarTodo();
 });

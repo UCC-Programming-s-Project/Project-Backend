@@ -47,7 +47,7 @@ public class AlquilerService {
         alquiler.setCliente(cliente);
         alquiler.setManga(manga);
 
-        // Generar fechas en el servidor
+      
         Date fechaInicio = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(fechaInicio);

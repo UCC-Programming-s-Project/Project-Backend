@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alquiler de Mangas UCC - Edición Premium</title>
-    <!-- Bootstrap CSS -->
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+ 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Barra de Navegación -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">📚 MangaUCC Pro</a>
@@ -19,7 +19,7 @@
 
     <div class="container mt-4 fade-in">
         <div class="row">
-            <!-- Columna Izquierda: Alquiler -->
+            
             <div class="col-lg-4">
                 <div class="card mb-4">
                     <div class="card-header">
@@ -46,22 +46,22 @@
                 </div>
             </div>
 
-            <!-- Columna Derecha: Listas -->
+           
             <div class="col-lg-8">
-                <!-- Alquileres Activos -->
+               
                 <div class="section-header">
                     <h2>Alquileres Activos</h2>
                 </div>
                 <div id="alquileres-list" class="row row-cols-1 row-cols-md-2 g-4 mb-4"></div>
 
-                <!-- Mangas Disponibles -->
+                
                 <div class="section-header">
                     <h2>Mangas Disponibles</h2>
                     <button id="addMangaBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#mangaModal">+ Añadir Manga</button>
                 </div>
                 <div id="mangas-list" class="row row-cols-1 row-cols-md-3 g-4 mb-4"></div>
 
-                <!-- Clientes -->
+              
                 <div class="section-header">
                     <h2>Clientes</h2>
                     <button id="addClienteBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#clienteModal">+ Añadir Cliente</button>
@@ -71,7 +71,7 @@
         </div>
     </div>
 
-    <!-- Modal: Gestionar Manga (Añadir/Editar) -->
+    
     <div class="modal fade" id="mangaModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <!-- Modal: Gestionar Cliente (Añadir/Editar) -->
+    
     <div class="modal fade" id="clienteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -127,9 +127,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- App JS -->
+    
     <script src="app.js"></script>
 </body>
 </html>

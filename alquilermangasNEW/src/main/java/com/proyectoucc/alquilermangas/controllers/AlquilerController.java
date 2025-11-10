@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/alquileres") // Ruta actualizada
-@CrossOrigin(origins = "*") // Habilitar CORS
+@RequestMapping("/api/alquileres") 
+@CrossOrigin(origins = "*")
 public class AlquilerController {
 
     private final AlquilerService alquilerService;

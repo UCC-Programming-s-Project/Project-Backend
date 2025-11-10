@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/mangas")
-@CrossOrigin(origins = "*") // Habilitar CORS
+@CrossOrigin(origins = "*") 
 public class MangaController {
 
     private final MangaService mangaService;
@@ -28,7 +28,7 @@ public class MangaController {
         Manga manga = new Manga();
         manga.setTitulo(mangaDTO.getTitulo());
         manga.setAutor(mangaDTO.getAutor());
-        manga.setImagenUrl(mangaDTO.getImagenUrl()); // <-- AÑADIDO
+        manga.setImagenUrl(mangaDTO.getImagenUrl()); 
 
         Manga nuevoManga = mangaService.save(manga);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toMangaDTO(nuevoManga));

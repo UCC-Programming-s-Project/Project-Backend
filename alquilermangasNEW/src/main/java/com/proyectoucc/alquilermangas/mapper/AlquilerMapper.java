@@ -10,12 +10,12 @@ import com.proyectoucc.alquilermangas.entities.Manga;
 public class AlquilerMapper {
 
     public static ClienteDTO toClienteDTO(Cliente cliente) {
-        // CORREGIDO: Añadido getCorreo()
+        
         return new ClienteDTO(cliente.getId(), cliente.getNombre(), cliente.getCorreo());
     }
 
     public static MangaDTO toMangaDTO(Manga manga) {
-        // CORREGIDO: Añadido getImagenUrl()
+        
         return new MangaDTO(manga.getId(), manga.getTitulo(), manga.getAutor(), manga.getImagenUrl(), manga.getDisponible());
     }
 

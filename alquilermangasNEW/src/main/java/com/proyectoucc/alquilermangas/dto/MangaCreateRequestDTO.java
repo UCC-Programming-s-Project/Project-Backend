@@ -8,5 +8,5 @@ import lombok.Setter;
 public class MangaCreateRequestDTO {
     private String titulo;
     private String autor;
-    private String imagenUrl; // <-- AÑADIDO
+    private String imagenUrl;
 }

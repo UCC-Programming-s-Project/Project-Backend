@@ -34,10 +34,10 @@ public class Alquiler {
         this.manga = manga;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.devuelto = false; // Aseguramos que siempre sea falso al crear
+        this.devuelto = false; 
     }
 
-    // Getters y Setters
+   
     public Long getId() {
         return id;
     }

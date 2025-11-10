@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "*") // Habilitar CORS
+@CrossOrigin(origins = "*") 
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -28,7 +28,7 @@ public class ClienteController {
     public ResponseEntity<ClienteDTO> create(@RequestBody ClienteCreateRequestDTO clienteDTO) {
         Cliente cliente = new Cliente();
         cliente.setNombre(clienteDTO.getNombre());
-        cliente.setCorreo(clienteDTO.getCorreo()); // <-- Añadido para la creación
+        cliente.setCorreo(clienteDTO.getCorreo());
 
         Cliente nuevoCliente = clienteService.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toClienteDTO(nuevoCliente));

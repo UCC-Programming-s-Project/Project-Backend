@@ -14,16 +14,16 @@ public class Cliente {
     private String nombre;
     private String correo;
 
-    // Constructor sin argumentos requerido por JPA
+    
     public Cliente() {}
 
-    // Constructor opcional
+   
     public Cliente(String nombre, String correo) {
         this.nombre = nombre;
         this.correo = correo;
     }
 
-    // Getters y setters
+ 
     public Long getId() {
         return id;
     }
