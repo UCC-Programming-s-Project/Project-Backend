@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formError = document.getElementById('form-error');
 
+    // Instancias de los Modales de Bootstrap
+    const addMangaModal = new bootstrap.Modal(document.getElementById('addMangaModal'));
+    const addClienteModal = new bootstrap.Modal(document.getElementById('addClienteModal'));
+
+
     // --- FUNCIONES DE CARGA DE DATOS ---
 
     async function cargarClientes() {
@@ -23,22 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const clientes = await response.json();
 
             clienteSelect.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
-            clientesList.innerHTML = ''; // Limpiar la lista de clientes visual
+            clientesList.innerHTML = ''; 
 
             clientes.forEach(cliente => {
-                // Poblar el menú desplegable
                 const option = document.createElement('option');
                 option.value = cliente.id;
                 option.textContent = cliente.nombre;
                 clienteSelect.appendChild(option);
 
-                // Poblar la lista visual de clientes con tarjetas Bootstrap
                 const clienteCardWrapper = document.createElement('div');
                 clienteCardWrapper.className = 'col';
                 clienteCardWrapper.innerHTML = `
                     <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">${cliente.nombre}</h5>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <h5 class="card-title text-center">${cliente.nombre}</h5>
                         </div>
                     </div>
                 `;
@@ -60,12 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             mangas.forEach(manga => {
                 const estadoText = manga.disponible ? 'DISPONIBLE' : 'ALQUILADO';
-                const estadoClass = manga.disponible ? 'bg-success' : 'bg-danger';
-                
+                const estadoClass = manga.disponible ? 'bg-success' : 'bg-secondary';
+                const imageUrl = `https://via.placeholder.com/400x250.png/2a2a2a/e0e0e0?text=${encodeURIComponent(manga.titulo)}`;
+
                 const mangaCardWrapper = document.createElement('div');
                 mangaCardWrapper.className = 'col';
                 mangaCardWrapper.innerHTML = `
                     <div class="card h-100">
+                         <img src="${imageUrl}" class="card-img-top manga-card-img" alt="Carátula de ${manga.titulo}">
                         <div class="card-body">
                             <h5 class="card-title">${manga.titulo}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">por ${manga.autor}</h6>
@@ -156,22 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clienteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const nombreInput = document.getElementById('clienteNombre');
-        const nombre = nombreInput.value.trim();
-
+        const nombre = document.getElementById('clienteNombre').value.trim();
         if (!nombre) return;
 
         try {
             const response = await fetch(`${API_URL}/clientes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre: nombre }),
+                body: JSON.stringify({ nombre }),
             });
 
             if (response.status === 201) {
                 clienteForm.reset();
+                addClienteModal.hide(); // Ocultar modal
                 cargarClientes();
-                cargarAlquileres(); // Recargar por si hay cambios que afecten visualización
             } else {
                 alert('Error al añadir cliente.');
             }
@@ -182,23 +185,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     mangaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const tituloInput = document.getElementById('mangaTitulo');
-        const autorInput = document.getElementById('mangaAutor');
-        const titulo = tituloInput.value.trim();
-        const autor = autorInput.value.trim();
-
+        const titulo = document.getElementById('mangaTitulo').value.trim();
+        const autor = document.getElementById('mangaAutor').value.trim();
         if (!titulo || !autor) return;
 
         try {
             const response = await fetch(`${API_URL}/mangas`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ titulo: titulo, autor: autor }),
+                body: JSON.stringify({ titulo, autor }),
             });
 
             if (response.status === 201) {
                 mangaForm.reset();
-                cargarMangas(); // Solo recargamos mangas
+                addMangaModal.hide(); // Ocultar modal
+                cargarMangas(); 
             } else {
                 alert('Error al añadir manga.');
             }
@@ -215,8 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     cargarTodo();
                 } else {
-                    const errorData = await response.json();
-                    alert(`Error al devolver: ${errorData.message}`);
+                    alert('Error al devolver el manga.');
                 }
             } catch (error) {
                 alert('No se pudo conectar con el servidor.');
