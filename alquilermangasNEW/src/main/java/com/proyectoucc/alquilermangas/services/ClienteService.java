@@ -1,3 +1,4 @@
+
 package com.proyectoucc.alquilermangas.services;
 
 import com.proyectoucc.alquilermangas.entities.Cliente;
@@ -32,7 +33,7 @@ public class ClienteService {
     public Cliente update(Long id, Cliente clienteDetails) {
         Cliente cliente = findById(id);
         cliente.setNombre(clienteDetails.getNombre());
-        cliente.setCorreo(clienteDetails.getCorreo());
+        // Se eliminó la línea que hacía referencia a 'correo'
         return clienteRepository.save(cliente);
     }
 

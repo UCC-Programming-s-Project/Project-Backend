@@ -1,5 +1,7 @@
+
 package com.proyectoucc.alquilermangas.controllers;
 
+import com.proyectoucc.alquilermangas.dto.ClienteCreateRequestDTO;
 import com.proyectoucc.alquilermangas.dto.ClienteDTO;
 import com.proyectoucc.alquilermangas.entities.Cliente;
 import com.proyectoucc.alquilermangas.mapper.AlquilerMapper;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/api/clientes") // Añadido /api para consistencia
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -22,7 +24,11 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ClienteDTO> create(@RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> create(@RequestBody ClienteCreateRequestDTO clienteDTO) {
+        // Creamos una entidad Cliente a partir del DTO
+        Cliente cliente = new Cliente();
+        cliente.setNombre(clienteDTO.getNombre());
+
         Cliente nuevoCliente = clienteService.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toClienteDTO(nuevoCliente));
     }
@@ -42,7 +48,10 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) { // Usamos DTO también aquí
+        Cliente cliente = new Cliente();
+        cliente.setNombre(clienteDTO.getNombre());
+
         Cliente clienteActualizado = clienteService.update(id, cliente);
         return ResponseEntity.ok(AlquilerMapper.toClienteDTO(clienteActualizado));
     }
