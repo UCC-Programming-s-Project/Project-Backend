@@ -23,7 +23,8 @@ public class StatService {
 
     public StatsDTO getStats() {
         long totalMangas = mangaRepository.count();
-        long mangasAlquilados = mangaRepository.findAll().stream().filter(m -> !m.isDisponible()).count();
+        // CORRECCIÓN: Cambiado de m.isDisponible() a m.getDisponible()
+        long mangasAlquilados = mangaRepository.findAll().stream().filter(m -> !m.getDisponible()).count();
         long mangasDisponibles = totalMangas - mangasAlquilados;
 
         MangaDTO mangaMasPopular = alquilerRepository.findMangaMasAlquiladoId()
