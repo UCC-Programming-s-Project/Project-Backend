@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'http://localhost:8080/api';
 
@@ -7,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const clienteSelect = document.getElementById('clienteSelect');
     const mangasDisponiblesList = document.getElementById('mangas-list');
     const alquileresActivosList = document.getElementById('alquileres-list');
-    const clientesList = document.getElementById('clientes-list'); // Nueva lista de clientes
+    const clientesList = document.getElementById('clientes-list');
 
     const alquilerForm = document.getElementById('alquilerForm');
-    const mangaForm = document.getElementById('mangaForm'); // Formulario de nuevo manga
-    const clienteForm = document.getElementById('clienteForm'); // Formulario de nuevo cliente
+    const mangaForm = document.getElementById('mangaForm');
+    const clienteForm = document.getElementById('clienteForm');
 
     const formError = document.getElementById('form-error');
 
@@ -33,11 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.textContent = cliente.nombre;
                 clienteSelect.appendChild(option);
 
-                // Poblar la lista visual de clientes
-                const clienteCard = document.createElement('div');
-                clienteCard.className = 'card';
-                clienteCard.innerHTML = `<h3>${cliente.nombre}</h3>`;
-                clientesList.appendChild(clienteCard);
+                // Poblar la lista visual de clientes con tarjetas Bootstrap
+                const clienteCardWrapper = document.createElement('div');
+                clienteCardWrapper.className = 'col';
+                clienteCardWrapper.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${cliente.nombre}</h5>
+                        </div>
+                    </div>
+                `;
+                clientesList.appendChild(clienteCardWrapper);
             });
         } catch (error) {
             console.error('Error cargando clientes:', error);
@@ -54,15 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
             mangaSelect.innerHTML = '<option value="">-- Seleccione un manga --</option>';
 
             mangas.forEach(manga => {
-                const estado = manga.disponible ? 'DISPONIBLE' : 'ALQUILADO';
-                const mangaCard = document.createElement('div');
-                mangaCard.className = 'card';
-                mangaCard.innerHTML = `
-                    <h3>${manga.titulo}</h3>
-                    <p>por ${manga.autor}</p>
-                    <p class="status status-${estado}">${estado}</p>
+                const estadoText = manga.disponible ? 'DISPONIBLE' : 'ALQUILADO';
+                const estadoClass = manga.disponible ? 'bg-success' : 'bg-danger';
+                
+                const mangaCardWrapper = document.createElement('div');
+                mangaCardWrapper.className = 'col';
+                mangaCardWrapper.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${manga.titulo}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">por ${manga.autor}</h6>
+                            <p class="card-text">
+                                <span class="badge ${estadoClass}">${estadoText}</span>
+                            </p>
+                        </div>
+                    </div>
                 `;
-                mangasDisponiblesList.appendChild(mangaCard);
+                mangasDisponiblesList.appendChild(mangaCardWrapper);
 
                 if (manga.disponible) {
                     const option = document.createElement('option');
@@ -84,15 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             alquileresActivosList.innerHTML = '';
             alquileres.filter(a => !a.devuelto).forEach(alquiler => {
-                const alquilerCard = document.createElement('div');
-                alquilerCard.className = 'card';
-                alquilerCard.innerHTML = `
-                    <h3>${alquiler.manga.titulo}</h3>
-                    <p><strong>Alquilado por:</strong> ${alquiler.cliente.nombre}</p>
-                    <p><strong>Fecha de Inicio:</strong> ${alquiler.fechaInicio}</p>
-                    <button class="devolver-btn" data-id="${alquiler.id}">Devolver</button>
+                const alquilerCardWrapper = document.createElement('div');
+                alquilerCardWrapper.className = 'col';
+                alquilerCardWrapper.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${alquiler.manga.titulo}</h5>
+                            <p class="card-text"><strong>Alquilado por:</strong> ${alquiler.cliente.nombre}</p>
+                            <p class="card-text"><small class="text-muted">Alquilado el: ${alquiler.fechaInicio}</small></p>
+                            <button class="btn btn-warning btn-sm devolver-btn" data-id="${alquiler.id}">Devolver</button>
+                        </div>
+                    </div>
                 `;
-                alquileresActivosList.appendChild(alquilerCard);
+                alquileresActivosList.appendChild(alquilerCardWrapper);
             });
         } catch (error) {
             console.error('Error cargando alquileres:', error);
@@ -153,7 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 201) {
                 clienteForm.reset();
-                cargarClientes(); // Solo recargamos clientes
+                cargarClientes();
+                cargarAlquileres(); // Recargar por si hay cambios que afecten visualización
             } else {
                 alert('Error al añadir cliente.');
             }
