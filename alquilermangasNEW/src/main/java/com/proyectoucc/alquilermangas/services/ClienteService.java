@@ -1,6 +1,7 @@
 
 package com.proyectoucc.alquilermangas.services;
 
+import com.proyectoucc.alquilermangas.dto.ClienteDTO;
 import com.proyectoucc.alquilermangas.entities.Cliente;
 import com.proyectoucc.alquilermangas.repositories.ClienteRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,10 +31,10 @@ public class ClienteService {
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + id));
     }
 
-    public Cliente update(Long id, Cliente clienteDetails) {
+    public Cliente update(Long id, ClienteDTO clienteDetails) {
         Cliente cliente = findById(id);
-        cliente.setNombre(clienteDetails.getNombre());
-        // Se eliminó la línea que hacía referencia a 'correo'
+        cliente.setNombre(clienteDetails.nombre());
+        cliente.setCorreo(clienteDetails.correo()); // <-- AÑADIDO
         return clienteRepository.save(cliente);
     }
 

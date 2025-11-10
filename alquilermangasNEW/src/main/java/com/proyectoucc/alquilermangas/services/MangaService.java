@@ -1,5 +1,6 @@
 package com.proyectoucc.alquilermangas.services;
 
+import com.proyectoucc.alquilermangas.dto.MangaDTO;
 import com.proyectoucc.alquilermangas.entities.Manga;
 import com.proyectoucc.alquilermangas.repositories.MangaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,11 +29,12 @@ public class MangaService {
         return mangaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Manga no encontrado con ID: " + id));
     }
 
-    public Manga update(Long id, Manga mangaDetails) {
+    public Manga update(Long id, MangaDTO mangaDetails) {
         Manga manga = findById(id);
-        manga.setTitulo(mangaDetails.getTitulo());
-        manga.setAutor(mangaDetails.getAutor());
-        manga.setDisponible(mangaDetails.getDisponible()); // Corregido
+        manga.setTitulo(mangaDetails.titulo());
+        manga.setAutor(mangaDetails.autor());
+        manga.setImagenUrl(mangaDetails.imagenUrl()); // <-- AÑADIDO
+        manga.setDisponible(mangaDetails.disponible());
         return mangaRepository.save(manga);
     }
 

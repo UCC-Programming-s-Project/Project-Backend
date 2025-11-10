@@ -1,26 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'http://localhost:8080/api';
 
-    // Referencias a elementos del DOM
+    // --- REFERENCIAS AL DOM ---
     const mangaSelect = document.getElementById('mangaSelect');
     const clienteSelect = document.getElementById('clienteSelect');
     const mangasDisponiblesList = document.getElementById('mangas-list');
     const alquileresActivosList = document.getElementById('alquileres-list');
     const clientesList = document.getElementById('clientes-list');
 
+    // Formularios
     const alquilerForm = document.getElementById('alquilerForm');
     const mangaForm = document.getElementById('mangaForm');
     const clienteForm = document.getElementById('clienteForm');
-
     const formError = document.getElementById('form-error');
 
-    // Instancias de los Modales de Bootstrap
-    const addMangaModal = new bootstrap.Modal(document.getElementById('addMangaModal'));
-    const addClienteModal = new bootstrap.Modal(document.getElementById('addClienteModal'));
+    // Modales (instancias de Bootstrap)
+    const mangaModal = new bootstrap.Modal(document.getElementById('mangaModal'));
+    const clienteModal = new bootstrap.Modal(document.getElementById('clienteModal'));
 
+    // --- FUNCIONES DE CARGA Y RENDERIZADO ---
 
-    // --- FUNCIONES DE CARGA DE DATOS ---
+    // Carga todos los datos iniciales
+    async function cargarTodo() {
+        await Promise.all([cargarClientes(), cargarMangas(), cargarAlquileres()]);
+    }
 
+    // Carga y muestra los clientes
     async function cargarClientes() {
         try {
             const response = await fetch(`${API_URL}/clientes`);
@@ -28,30 +33,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const clientes = await response.json();
 
             clienteSelect.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
-            clientesList.innerHTML = ''; 
+            clientesList.innerHTML = '';
 
             clientes.forEach(cliente => {
+                // Añadir al dropdown de alquiler
                 const option = document.createElement('option');
                 option.value = cliente.id;
                 option.textContent = cliente.nombre;
                 clienteSelect.appendChild(option);
 
-                const clienteCardWrapper = document.createElement('div');
-                clienteCardWrapper.className = 'col';
-                clienteCardWrapper.innerHTML = `
+                // Crear tarjeta de cliente
+                const clienteCard = document.createElement('div');
+                clienteCard.className = 'col';
+                clienteCard.innerHTML = `
                     <div class="card h-100">
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            <h5 class="card-title text-center">${cliente.nombre}</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">${cliente.nombre}</h5>
+                            <p class="card-text text-muted">${cliente.correo || 'Sin correo'}</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2 editar-cliente-btn" data-id="${cliente.id}">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger eliminar-cliente-btn" data-id="${cliente.id}">Eliminar</button>
                         </div>
                     </div>
                 `;
-                clientesList.appendChild(clienteCardWrapper);
+                clientesList.appendChild(clienteCard);
             });
         } catch (error) {
             console.error('Error cargando clientes:', error);
         }
     }
 
+    // Carga y muestra los mangas
     async function cargarMangas() {
         try {
             const response = await fetch(`${API_URL}/mangas`);
@@ -64,24 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
             mangas.forEach(manga => {
                 const estadoText = manga.disponible ? 'DISPONIBLE' : 'ALQUILADO';
                 const estadoClass = manga.disponible ? 'bg-success' : 'bg-secondary';
-                const imageUrl = `https://via.placeholder.com/400x250.png/2a2a2a/e0e0e0?text=${encodeURIComponent(manga.titulo)}`;
+                // Usar imagen del manga o una por defecto
+                const imageUrl = manga.imagenUrl || `https://via.placeholder.com/400x600.png/2a2a2a/e0e0e0?text=${encodeURIComponent(manga.titulo)}`;
 
-                const mangaCardWrapper = document.createElement('div');
-                mangaCardWrapper.className = 'col';
-                mangaCardWrapper.innerHTML = `
+                // Crear tarjeta de manga
+                const mangaCard = document.createElement('div');
+                mangaCard.className = 'col';
+                mangaCard.innerHTML = `
                     <div class="card h-100">
-                         <img src="${imageUrl}" class="card-img-top manga-card-img" alt="Carátula de ${manga.titulo}">
+                        <img src="${imageUrl}" class="card-img-top manga-card-img" alt="${manga.titulo}">
                         <div class="card-body">
                             <h5 class="card-title">${manga.titulo}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">por ${manga.autor}</h6>
-                            <p class="card-text">
-                                <span class="badge ${estadoClass}">${estadoText}</span>
-                            </p>
+                            <h6 class="card-subtitle mb-2 text-muted">${manga.autor}</h6>
+                            <span class="badge ${estadoClass}">${estadoText}</span>
+                        </div>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2 editar-manga-btn" data-id="${manga.id}">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger eliminar-manga-btn" data-id="${manga.id}">Eliminar</button>
                         </div>
                     </div>
                 `;
-                mangasDisponiblesList.appendChild(mangaCardWrapper);
+                mangasDisponiblesList.appendChild(mangaCard);
 
+                // Añadir al dropdown de alquiler si está disponible
                 if (manga.disponible) {
                     const option = document.createElement('option');
                     option.value = manga.id;
@@ -94,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Carga y muestra los alquileres activos
     async function cargarAlquileres() {
         try {
             const response = await fetch(`${API_URL}/alquileres`);
@@ -102,33 +121,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
             alquileresActivosList.innerHTML = '';
             alquileres.filter(a => !a.devuelto).forEach(alquiler => {
-                const alquilerCardWrapper = document.createElement('div');
-                alquilerCardWrapper.className = 'col';
-                alquilerCardWrapper.innerHTML = `
+                const alquilerCard = document.createElement('div');
+                alquilerCard.className = 'col';
+                alquilerCard.innerHTML = `
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">${alquiler.manga.titulo}</h5>
                             <p class="card-text"><strong>Alquilado por:</strong> ${alquiler.cliente.nombre}</p>
-                            <p class="card-text"><small class="text-muted">Alquilado el: ${alquiler.fechaInicio}</small></p>
-                            <button class="btn btn-warning btn-sm devolver-btn" data-id="${alquiler.id}">Devolver</button>
+                            <p class="card-text"><small class="text-muted">Alquilado el: ${new Date(alquiler.fechaInicio).toLocaleDateString()}</small></p>
+                            <button class="btn btn-warning btn-sm devolver-btn w-100" data-id="${alquiler.id}">Devolver</button>
                         </div>
                     </div>
                 `;
-                alquileresActivosList.appendChild(alquilerCardWrapper);
+                alquileresActivosList.appendChild(alquilerCard);
             });
         } catch (error) {
             console.error('Error cargando alquileres:', error);
         }
     }
 
-    function cargarTodo() {
-        cargarClientes();
-        cargarMangas();
-        cargarAlquileres();
-    }
+    // --- MANEJADORES DE EVENTOS PARA FORMULARIOS ---
 
-    // --- MANEJADORES DE EVENTOS ---
+    // Formulario de Cliente (Crear/Editar)
+    clienteForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('clienteId').value;
+        const nombre = document.getElementById('clienteNombre').value.trim();
+        const correo = document.getElementById('clienteCorreo').value.trim();
+        if (!nombre) return;
 
+        const url = id ? `${API_URL}/clientes/${id}` : `${API_URL}/clientes`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id ? parseInt(id) : undefined, nombre, correo }),
+            });
+
+            if (response.ok) {
+                clienteModal.hide();
+                cargarTodo();
+            } else {
+                alert('Error al guardar el cliente.');
+            }
+        } catch (error) {
+            alert('No se pudo conectar al servidor.');
+        }
+    });
+
+    // Formulario de Manga (Crear/Editar)
+    mangaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('mangaId').value;
+        const titulo = document.getElementById('mangaTitulo').value.trim();
+        const autor = document.getElementById('mangaAutor').value.trim();
+        const imagenUrl = document.getElementById('mangaImagenUrl').value.trim();
+        if (!titulo || !autor) return;
+
+        const url = id ? `${API_URL}/mangas/${id}` : `${API_URL}/mangas`;
+        const method = id ? 'PUT' : 'POST';
+        
+        // Para PUT, necesitamos enviar también el estado 'disponible'
+        const mangaData = { titulo, autor, imagenUrl };
+        if(id) {
+            const originalMangaResponse = await fetch(`${API_URL}/mangas/${id}`);
+            const originalManga = await originalMangaResponse.json();
+            mangaData.disponible = originalManga.disponible;
+        }
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mangaData),
+            });
+
+            if (response.ok) {
+                mangaModal.hide();
+                cargarTodo();
+            } else {
+                alert('Error al guardar el manga.');
+            }
+        } catch (error) {
+            alert('No se pudo conectar al servidor.');
+        }
+    });
+    
+    // Formulario de Alquiler
     alquilerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         formError.textContent = '';
@@ -159,55 +240,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    clienteForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nombre = document.getElementById('clienteNombre').value.trim();
-        if (!nombre) return;
+    // --- MANEJADORES DE EVENTOS PARA BOTONES (Click Delegation) ---
 
-        try {
-            const response = await fetch(`${API_URL}/clientes`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre }),
-            });
+    // Botón para abrir modal de 'Añadir Cliente'
+    document.getElementById('addClienteBtn').addEventListener('click', () => {
+        document.getElementById('clienteModalTitle').textContent = 'Añadir Nuevo Cliente';
+        clienteForm.reset();
+        document.getElementById('clienteId').value = '';
+    });
 
-            if (response.status === 201) {
-                clienteForm.reset();
-                addClienteModal.hide(); // Ocultar modal
-                cargarClientes();
-            } else {
-                alert('Error al añadir cliente.');
+    // Botón para abrir modal de 'Añadir Manga'
+    document.getElementById('addMangaBtn').addEventListener('click', () => {
+        document.getElementById('mangaModalTitle').textContent = 'Añadir Nuevo Manga';
+        mangaForm.reset();
+        document.getElementById('mangaId').value = '';
+    });
+
+    // Clicks en la lista de clientes (Editar/Eliminar)
+    clientesList.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id;
+        if (e.target.classList.contains('editar-cliente-btn')) {
+            const response = await fetch(`${API_URL}/clientes/${id}`);
+            const cliente = await response.json();
+            document.getElementById('clienteModalTitle').textContent = 'Editar Cliente';
+            document.getElementById('clienteId').value = cliente.id;
+            document.getElementById('clienteNombre').value = cliente.nombre;
+            document.getElementById('clienteCorreo').value = cliente.correo;
+            clienteModal.show();
+        } else if (e.target.classList.contains('eliminar-cliente-btn')) {
+            if (confirm(`¿Seguro que quieres eliminar al cliente con ID ${id}?`)) {
+                await fetch(`${API_URL}/clientes/${id}`, { method: 'DELETE' });
+                cargarTodo();
             }
-        } catch (error) {
-            alert('No se pudo conectar al servidor.');
         }
     });
 
-    mangaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('mangaTitulo').value.trim();
-        const autor = document.getElementById('mangaAutor').value.trim();
-        if (!titulo || !autor) return;
-
-        try {
-            const response = await fetch(`${API_URL}/mangas`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ titulo, autor }),
-            });
-
-            if (response.status === 201) {
-                mangaForm.reset();
-                addMangaModal.hide(); // Ocultar modal
-                cargarMangas(); 
-            } else {
-                alert('Error al añadir manga.');
+    // Clicks en la lista de mangas (Editar/Eliminar)
+    mangasDisponiblesList.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id;
+        if (e.target.classList.contains('editar-manga-btn')) {
+            const response = await fetch(`${API_URL}/mangas/${id}`);
+            const manga = await response.json();
+            document.getElementById('mangaModalTitle').textContent = 'Editar Manga';
+            document.getElementById('mangaId').value = manga.id;
+            document.getElementById('mangaTitulo').value = manga.titulo;
+            document.getElementById('mangaAutor').value = manga.autor;
+            document.getElementById('mangaImagenUrl').value = manga.imagenUrl;
+            mangaModal.show();
+        } else if (e.target.classList.contains('eliminar-manga-btn')) {
+            if (confirm(`¿Seguro que quieres eliminar el manga con ID ${id}?`)) {
+                await fetch(`${API_URL}/mangas/${id}`, { method: 'DELETE' });
+                cargarTodo();
             }
-        } catch (error) {
-            alert('No se pudo conectar al servidor.');
         }
     });
-
+    
+    // Clicks en la lista de alquileres (Devolver)
     alquileresActivosList.addEventListener('click', async (e) => {
         if (e.target.classList.contains('devolver-btn')) {
             const alquilerId = e.target.dataset.id;

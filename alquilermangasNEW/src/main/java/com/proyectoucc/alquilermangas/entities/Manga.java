@@ -10,17 +10,17 @@ public class Manga {
 
     private String titulo;
     private String autor;
-    // Corregido: Inicializado a true por defecto
+    private String imagenUrl; // <-- NUEVO CAMPO
     private boolean disponible = true;
 
     // Constructor sin argumentos requerido por JPA
     public Manga() {}
 
-    // Constructor opcional
-    public Manga(String titulo, String autor, boolean disponible) {
+    // Constructor opcional para facilitar la creación
+    public Manga(String titulo, String autor, String imagenUrl) {
         this.titulo = titulo;
         this.autor = autor;
-        this.disponible = disponible;
+        this.imagenUrl = imagenUrl;
     }
 
     // Getters y setters
@@ -33,7 +33,9 @@ public class Manga {
     public String getAutor() { return autor; }
     public void setAutor(String autor) { this.autor = autor; }
 
-    // Corregido: Renombrado a getDisponible() para una correcta serialización JSON
+    public String getImagenUrl() { return imagenUrl; }
+    public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
+
     public boolean getDisponible() { return disponible; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
 }

@@ -28,6 +28,7 @@ public class MangaController {
         Manga manga = new Manga();
         manga.setTitulo(mangaDTO.getTitulo());
         manga.setAutor(mangaDTO.getAutor());
+        manga.setImagenUrl(mangaDTO.getImagenUrl()); // <-- AÑADIDO
 
         Manga nuevoManga = mangaService.save(manga);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toMangaDTO(nuevoManga));
@@ -48,8 +49,8 @@ public class MangaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MangaDTO> update(@PathVariable Long id, @RequestBody Manga manga) {
-        Manga mangaActualizado = mangaService.update(id, manga);
+    public ResponseEntity<MangaDTO> update(@PathVariable Long id, @RequestBody MangaDTO mangaDetails) {
+        Manga mangaActualizado = mangaService.update(id, mangaDetails);
         return ResponseEntity.ok(AlquilerMapper.toMangaDTO(mangaActualizado));
     }
 

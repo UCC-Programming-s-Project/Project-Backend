@@ -28,6 +28,7 @@ public class ClienteController {
     public ResponseEntity<ClienteDTO> create(@RequestBody ClienteCreateRequestDTO clienteDTO) {
         Cliente cliente = new Cliente();
         cliente.setNombre(clienteDTO.getNombre());
+        cliente.setCorreo(clienteDTO.getCorreo()); // <-- Añadido para la creación
 
         Cliente nuevoCliente = clienteService.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toClienteDTO(nuevoCliente));
@@ -48,11 +49,8 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
-        Cliente cliente = new Cliente();
-        cliente.setNombre(clienteDTO.nombre());
-
-        Cliente clienteActualizado = clienteService.update(id, cliente);
+    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDetails) {
+        Cliente clienteActualizado = clienteService.update(id, clienteDetails);
         return ResponseEntity.ok(AlquilerMapper.toClienteDTO(clienteActualizado));
     }
 
