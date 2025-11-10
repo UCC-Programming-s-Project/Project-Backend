@@ -15,7 +15,8 @@ public class AlquilerMapper {
     }
 
     public static MangaDTO toMangaDTO(Manga manga) {
-        return new MangaDTO(manga.getId(), manga.getTitulo(), manga.getAutor(), manga.isDisponible());
+        // Corregido: Se cambió isDisponible() por getDisponible()
+        return new MangaDTO(manga.getId(), manga.getTitulo(), manga.getAutor(), manga.getDisponible());
     }
 
     public static AlquilerDTO toAlquilerDTO(Alquiler alquiler) {

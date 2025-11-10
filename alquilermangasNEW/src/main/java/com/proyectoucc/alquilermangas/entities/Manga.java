@@ -10,7 +10,8 @@ public class Manga {
 
     private String titulo;
     private String autor;
-    private boolean disponible;
+    // Corregido: Inicializado a true por defecto
+    private boolean disponible = true;
 
     // Constructor sin argumentos requerido por JPA
     public Manga() {}
@@ -32,6 +33,7 @@ public class Manga {
     public String getAutor() { return autor; }
     public void setAutor(String autor) { this.autor = autor; }
 
-    public boolean isDisponible() { return disponible; }
+    // Corregido: Renombrado a getDisponible() para una correcta serialización JSON
+    public boolean getDisponible() { return disponible; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
 }
