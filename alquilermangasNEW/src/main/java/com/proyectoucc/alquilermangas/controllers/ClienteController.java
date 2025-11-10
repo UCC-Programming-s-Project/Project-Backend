@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clientes")
+@CrossOrigin(origins = "*") // Habilitar CORS
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -26,7 +27,6 @@ public class ClienteController {
     @PostMapping
     public ResponseEntity<ClienteDTO> create(@RequestBody ClienteCreateRequestDTO clienteDTO) {
         Cliente cliente = new Cliente();
-        // Usamos .getNombre() porque ClienteCreateRequestDTO usa Lombok
         cliente.setNombre(clienteDTO.getNombre());
 
         Cliente nuevoCliente = clienteService.save(cliente);
@@ -50,7 +50,6 @@ public class ClienteController {
     @PutMapping("/{id}")
     public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
-        // Usamos .nombre() porque ClienteDTO es un record
         cliente.setNombre(clienteDTO.nombre());
 
         Cliente clienteActualizado = clienteService.update(id, cliente);

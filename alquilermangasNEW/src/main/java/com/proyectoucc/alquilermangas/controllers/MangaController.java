@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/mangas") // Corregido: Añadido /api
+@RequestMapping("/api/mangas")
+@CrossOrigin(origins = "*") // Habilitar CORS
 public class MangaController {
 
     private final MangaService mangaService;
@@ -27,7 +28,6 @@ public class MangaController {
         Manga manga = new Manga();
         manga.setTitulo(mangaDTO.getTitulo());
         manga.setAutor(mangaDTO.getAutor());
-        // 'disponible' se establece a true por defecto en la lógica de negocio
 
         Manga nuevoManga = mangaService.save(manga);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toMangaDTO(nuevoManga));
@@ -47,7 +47,6 @@ public class MangaController {
         return ResponseEntity.ok(AlquilerMapper.toMangaDTO(manga));
     }
 
-    // El método update también debería usar un DTO, pero se deja para futura mejora.
     @PutMapping("/{id}")
     public ResponseEntity<MangaDTO> update(@PathVariable Long id, @RequestBody Manga manga) {
         Manga mangaActualizado = mangaService.update(id, manga);

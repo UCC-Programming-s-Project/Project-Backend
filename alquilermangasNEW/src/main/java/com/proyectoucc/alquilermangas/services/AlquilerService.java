@@ -11,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,7 +36,7 @@ public class AlquilerService {
         Manga manga = mangaRepository.findById(requestDTO.mangaId())
                 .orElseThrow(() -> new EntityNotFoundException("Manga no encontrado"));
 
-        if (!manga.getDisponible()) { // Corregido
+        if (!manga.getDisponible()) {
             throw new IllegalStateException("El manga no está disponible para alquilar");
         }
 
@@ -44,8 +46,16 @@ public class AlquilerService {
         Alquiler alquiler = new Alquiler();
         alquiler.setCliente(cliente);
         alquiler.setManga(manga);
-        alquiler.setFechaInicio(requestDTO.fechaInicio());
-        alquiler.setFechaFin(requestDTO.fechaFin());
+
+        // Generar fechas en el servidor
+        Date fechaInicio = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fechaInicio);
+        cal.add(Calendar.DAY_OF_YEAR, 7);
+        Date fechaFin = cal.getTime();
+
+        alquiler.setFechaInicio(fechaInicio);
+        alquiler.setFechaFin(fechaFin);
         alquiler.setDevuelto(false);
 
         return alquilerRepository.save(alquiler);
