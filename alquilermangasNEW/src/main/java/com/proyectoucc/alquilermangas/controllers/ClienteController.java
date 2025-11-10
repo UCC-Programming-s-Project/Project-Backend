@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/clientes") // Añadido /api para consistencia
+@RequestMapping("/api/clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -25,8 +25,8 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<ClienteDTO> create(@RequestBody ClienteCreateRequestDTO clienteDTO) {
-        // Creamos una entidad Cliente a partir del DTO
         Cliente cliente = new Cliente();
+        // Usamos .getNombre() porque ClienteCreateRequestDTO usa Lombok
         cliente.setNombre(clienteDTO.getNombre());
 
         Cliente nuevoCliente = clienteService.save(cliente);
@@ -48,9 +48,10 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) { // Usamos DTO también aquí
+    public ResponseEntity<ClienteDTO> update(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
-        cliente.setNombre(clienteDTO.getNombre());
+        // Usamos .nombre() porque ClienteDTO es un record
+        cliente.setNombre(clienteDTO.nombre());
 
         Cliente clienteActualizado = clienteService.update(id, cliente);
         return ResponseEntity.ok(AlquilerMapper.toClienteDTO(clienteActualizado));
