@@ -35,14 +35,14 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // --- CREACIÓN DE MANGAS (CONSTRUCTOR CORRECTO) ---
-        Manga m1 = new Manga("Jujutsu Kaisen", "Gege Akutami", "https://m.media-amazon.com/images/I/81s+jXq3pLL._AC_UF1000,1000_QL80_.jpg");
-        Manga m2 = new Manga("Shingeki no Kyojin", "Hajime Isayama", "https://m.media-amazon.com/images/I/81XFBG2hEXL._AC_UF1000,1000_QL80_.jpg");
-        Manga m3 = new Manga("One Piece", "Eiichiro Oda", "https://m.media-amazon.com/images/I/812c+5a0D9L._AC_UF1000,1000_QL80_.jpg");
-        Manga m4 = new Manga("Chainsaw Man", "Tatsuki Fujimoto", "https://m.media-amazon.com/images/I/81s7B+Als+L._AC_UF1000,1000_QL80_.jpg");
-        Manga m5 = new Manga("Spy x Family", "Tatsuya Endo", "https://m.media-amazon.com/images/I/81dG0k2I+gL._AC_UF1000,1000_QL80_.jpg");
-        Manga m6 = new Manga("My Hero Academia", "Kohei Horikoshi", "https://m.media-amazon.com/images/I/81x22b442hL._AC_UF1000,1000_QL80_.jpg");
-        Manga m7 = new Manga("Berserk", "Kentaro Miura", "https://m.media-amazon.com/images/I/81GDu4Bw6iL._AC_UF1000,1000_QL80_.jpg");
-        Manga m8 = new Manga("Vinland Saga", "Makoto Yukimura", "https://m.media-amazon.com/images/I/815E2CM2dCL._AC_UF1000,1000_QL80_.jpg");
+        Manga m1 = new Manga("Jujutsu Kaisen", "Gege Akutami", "https://images.cdn3.buscalibre.com/fit-in/360x360/c3/04/c3040c764d43cfafc9ed4f574382f392.jpg");
+        Manga m2 = new Manga("Shingeki no Kyojin", "Hajime Isayama", "https://images.cdn3.buscalibre.com/fit-in/360x360/1c/0f/1c0fcde97176af55b90f6dd069f35987.jpg");
+        Manga m3 = new Manga("One Piece", "Eiichiro Oda", "https://images.cdn1.buscalibre.com/fit-in/360x360/71/55/71553b3c259caf6cbb510b7eb001e632.jpg");
+        Manga m4 = new Manga("Chainsaw Man", "Tatsuki Fujimoto", "https://images.cdn2.buscalibre.com/fit-in/360x360/0b/cc/0bcc6f5b0943f60f56888436fd2ec774.jpg");
+        Manga m5 = new Manga("Spy x Family", "Tatsuya Endo", "https://images.cdn3.buscalibre.com/fit-in/360x360/11/a6/11a66b986283f30d0868b10d945387a1.jpg");
+        Manga m6 = new Manga("My Hero Academia", "Kohei Horikoshi", "https://images.cdn1.buscalibre.com/fit-in/360x360/d0/7c/d07c97b045f4ac9482c5716d300cd225.jpg");
+        Manga m7 = new Manga("Berserk", "Kentaro Miura", "https://images.cdn3.buscalibre.com/fit-in/360x360/5e/eb/5eeb9b910ef55fe5048b3b42731a991c.jpg");
+        Manga m8 = new Manga("Vinland Saga", "Makoto Yukimura", "https://images.cdn3.buscalibre.com/fit-in/360x360/a6/8e/a68ecd8626654dcfcaf0f4f091ab00ff.jpg");
         mangaRepository.saveAll(Arrays.asList(m1, m2, m3, m4, m5, m6, m7, m8));
 
         // --- CREACIÓN DE CLIENTES ---
