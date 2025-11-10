@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/mangas")
-@CrossOrigin(origins = "*") 
+@CrossOrigin(origins = "*")
 public class MangaController {
 
     private final MangaService mangaService;
@@ -28,18 +28,23 @@ public class MangaController {
         Manga manga = new Manga();
         manga.setTitulo(mangaDTO.getTitulo());
         manga.setAutor(mangaDTO.getAutor());
-        manga.setImagenUrl(mangaDTO.getImagenUrl()); 
-
+        manga.setImagenUrl(mangaDTO.getImagenUrl());
         Manga nuevoManga = mangaService.save(manga);
         return ResponseEntity.status(HttpStatus.CREATED).body(AlquilerMapper.toMangaDTO(nuevoManga));
     }
 
     @GetMapping
-    public ResponseEntity<List<MangaDTO>> getAll() {
-        List<MangaDTO> mangas = mangaService.findAll().stream()
+    public ResponseEntity<List<MangaDTO>> getAll(@RequestParam(required = false) String titulo) {
+        List<Manga> mangas;
+        if (titulo != null && !titulo.isEmpty()) {
+            mangas = mangaService.searchByTitulo(titulo);
+        } else {
+            mangas = mangaService.findAll();
+        }
+        List<MangaDTO> mangaDTOs = mangas.stream()
                 .map(AlquilerMapper::toMangaDTO)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(mangas);
+        return ResponseEntity.ok(mangaDTOs);
     }
 
     @GetMapping("/{id}")

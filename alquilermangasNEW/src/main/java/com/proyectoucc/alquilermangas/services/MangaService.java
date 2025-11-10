@@ -25,6 +25,11 @@ public class MangaService {
         return mangaRepository.findAll();
     }
 
+    // Nuevo método para buscar mangas por título
+    public List<Manga> searchByTitulo(String titulo) {
+        return mangaRepository.findByTituloContainingIgnoreCase(titulo);
+    }
+
     public Manga findById(Long id) {
         return mangaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Manga no encontrado con ID: " + id));
     }

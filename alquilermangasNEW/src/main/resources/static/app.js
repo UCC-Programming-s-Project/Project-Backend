@@ -1,35 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_URL = 'http://localhost:8080/api';
 
-
+    // ... (selectores y modales como antes)
     const mangaSelect = document.getElementById('mangaSelect');
     const clienteSelect = document.getElementById('clienteSelect');
     const fechaFinInput = document.getElementById('fechaFin');
     const mangasDisponiblesList = document.getElementById('mangas-list');
     const alquileresActivosList = document.getElementById('alquileres-list');
     const clientesList = document.getElementById('clientes-list');
-
+    const mangaSearchInput = document.getElementById('mangaSearchInput');
 
     const alquilerForm = document.getElementById('alquilerForm');
     const mangaForm = document.getElementById('mangaForm');
     const clienteForm = document.getElementById('clienteForm');
     const formError = document.getElementById('form-error');
-
-
     const mangaModal = new bootstrap.Modal(document.getElementById('mangaModal'));
     const clienteModal = new bootstrap.Modal(document.getElementById('clienteModal'));
 
+    // --- FUNCIONES DE CARGA DE DATOS ---
 
     function setMinDate() {
         const today = new Date().toISOString().split('T')[0];
         fechaFinInput.setAttribute('min', today);
     }
 
-   
+    // Carga inicial de todos los datos de la aplicación
     async function cargarTodo() {
-        await Promise.all([cargarClientes(), cargarMangas(), cargarAlquileres()]);
+        // Ahora también cargamos las estadísticas
+        await Promise.all([cargarClientes(), cargarMangas(), cargarAlquileres(), cargarEstadisticas()]);
     }
 
+    // <-- NUEVA FUNCIÓN: Cargar y mostrar estadísticas del dashboard -->
+    async function cargarEstadisticas() {
+        try {
+            const response = await fetch(`${API_URL}/stats`);
+            if (!response.ok) throw new Error('Error al cargar estadísticas');
+            const stats = await response.json();
+
+            document.getElementById('stat-total-mangas').textContent = stats.totalMangas;
+            document.getElementById('stat-mangas-disponibles').textContent = stats.mangasDisponibles;
+            document.getElementById('stat-mangas-alquilados').textContent = stats.mangasAlquilados;
+            document.getElementById('stat-manga-popular').textContent = stats.mangaMasPopular ? stats.mangaMasPopular.titulo : 'N/A';
+
+        } catch (error) {
+            console.error(error);
+            // En caso de error, mostrar un mensaje en las tarjetas
+            document.getElementById('stat-total-mangas').textContent = 'Error';
+            document.getElementById('stat-mangas-disponibles').textContent = 'Error';
+            document.getElementById('stat-mangas-alquilados').textContent = 'Error';
+            document.getElementById('stat-manga-popular').textContent = 'Error';
+        }
+    }
+
+    // ... (cargarClientes, cargarMangas, cargarAlquileres sin cambios)
     async function cargarClientes() {
         try {
             const response = await fetch(`${API_URL}/clientes`);
@@ -60,13 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(error); }
     }
 
-    async function cargarMangas() {
+    async function cargarMangas(searchTerm = '') {
         try {
-            const response = await fetch(`${API_URL}/mangas`);
+            const url = searchTerm ? `${API_URL}/mangas?titulo=${encodeURIComponent(searchTerm)}` : `${API_URL}/mangas`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Error al cargar mangas');
             const mangas = await response.json();
             mangasDisponiblesList.innerHTML = '';
-            mangaSelect.innerHTML = '<option value="">-- Seleccione un manga --</option>';
+            if (!searchTerm) {
+                mangaSelect.innerHTML = '<option value="">-- Seleccione un manga --</option>';
+            }
             mangas.forEach(manga => {
                 const estadoText = manga.disponible ? 'DISPONIBLE' : 'ALQUILADO';
                 const estadoClass = manga.disponible ? 'bg-success' : 'bg-secondary';
@@ -74,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = 'col';
                 card.innerHTML = `
-                    <div class="card h-100">
+                    <div class="card h-100 manga-card">
                         <img src="${imageUrl}" class="card-img-top manga-card-img" alt="${manga.titulo}">
                         <div class="card-body">
                             <h5 class="card-title">${manga.titulo}</h5>
@@ -87,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>`;
                 mangasDisponiblesList.appendChild(card);
-                if (manga.disponible) {
+                if (manga.disponible && !searchTerm) {
                     const option = document.createElement('option');
                     option.value = manga.id;
                     option.textContent = manga.titulo;
@@ -103,12 +129,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Error al cargar alquileres');
             const alquileres = await response.json();
             alquileresActivosList.innerHTML = '';
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
             alquileres.filter(a => !a.devuelto).forEach(alquiler => {
                 const card = document.createElement('div');
                 card.className = 'col';
-                // **MODIFICADO: Muestra fecha de inicio y fin **
+                
+                const fechaFin = new Date(alquiler.fechaFin);
+                let cardClass = 'h-100';
+                if (fechaFin < hoy) {
+                    cardClass += ' alquiler-vencido';
+                }
+
                 card.innerHTML = `
-                    <div class="card h-100">
+                    <div class="card ${cardClass}">
                         <div class="card-body">
                             <h5 class="card-title">${alquiler.manga.titulo}</h5>
                             <p class="card-text"><strong>Alquilado por:</strong> ${alquiler.cliente.nombre}</p>
@@ -122,8 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(error); }
     }
 
+    // --- MANEJADORES DE EVENTOS ---
+    mangaSearchInput.addEventListener('input', (e) => {
+        cargarMangas(e.target.value);
+    });
     
-
+    // ... (resto de manejadores sin cambios)
     clienteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('clienteId').value;
@@ -271,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
+    // --- INICIALIZACIÓN ---
     setMinDate();
     cargarTodo();
 });

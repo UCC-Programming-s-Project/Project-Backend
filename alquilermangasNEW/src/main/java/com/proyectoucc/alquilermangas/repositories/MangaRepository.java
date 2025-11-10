@@ -1,6 +1,11 @@
 package com.proyectoucc.alquilermangas.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.proyectoucc.alquilermangas.entities.Manga;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MangaRepository extends JpaRepository<Manga, Long> {}
+import java.util.List;
+
+public interface MangaRepository extends JpaRepository<Manga, Long> {
+    // Nuevo método para buscar mangas por título (ignorando mayúsculas/minúsculas)
+    List<Manga> findByTituloContainingIgnoreCase(String titulo);
+}
